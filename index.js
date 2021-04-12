@@ -9,88 +9,178 @@ const config = {
   },
 };
 
+const timeElement = document.getElementById("time-text");
+const restartBtn = document.getElementById("restart-btn");
+const numberOfMeteors = document.getElementById("number-of-meteors");
+const gameType = document.getElementById("game-type");
+
 const gameConfig = {
-  meteorScale: 0.09,
-  numberOfMeteors: 7,
-  gameType: "A",
+  meteorScale: 0.2,
+  numberOfMeteors: numberOfMeteors.value,
+  gameType: gameType.value,
   grid: new Array(8).fill(0).map(() => new Array(6).fill(0)),
 };
 
-const timeElement = document.getElementById("time-text");
-const restartBtn = document.getElementById("restart-btn");
 restartBtn.addEventListener("click", restart);
 let timer;
 let game;
 let timeInSeconds = 0;
 let timerOn = false;
+let sequence = [];
 
 game = new Phaser.Game(config);
-const meteors = [];
+let meteors = [];
 
 function preload() {
-  this.load.image("starfield", "assets/starfield.png");
   this.load.image("meteor", "assets/meteor.png");
 }
 
 function create() {
-  this.add.image(0, 0, "starfield").setOrigin(0, 0);
+  meteors = [];
+  this.cameras.main.backgroundColor.setTo(255, 255, 255);
+  generateSequence(gameConfig.gameType);
+  const style = {
+    font: "30px Arial",
+    fill: "#000000",
+    wordWrap: true,
+    fontWeight: "bold",
+    wordWrapWidth: 0,
+    align: "center",
+  };
+  const wordsArray = [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "Ñ",
+    "O",
+    "P",
+    "Q",
+  ];
+
   for (let i = 0; i < gameConfig.numberOfMeteors; i++) {
-    const randomCoords = generateNonInclusiveRandom();
-    const meteor = this.add
-      .sprite(randomCoords.x, randomCoords.y, "meteor")
-      .setOrigin(0, 0);
-    meteor.setInteractive({ cursor: "pointer" });
-    meteor.setScale(gameConfig.meteorScale);
+    let randomCoords;
 
-    const style = {
-      font: "30px Arial",
-      fill: "#FFFFFF",
-      wordWrap: true,
-      fontWeight: "bold",
-      wordWrapWidth: meteor.width,
-      align: "center",
-    };
+    if (gameConfig.gameType === "B") {
+      randomCoords = generateNonInclusiveRandom();
+      const meteorNumber = this.add
+        .sprite(randomCoords.x, randomCoords.y, "meteor")
+        .setOrigin(0, 0);
+      meteorNumber.setInteractive({ cursor: "pointer" });
+      meteorNumber.setScale(gameConfig.meteorScale);
+      style.wordWrapWidth = meteorNumber.width;
+      const text = this.add
+        .text(randomCoords.x + 40, randomCoords.y + 35, `${i + 1}`, style)
+        .setOrigin(0, 0);
+      meteors.push({
+        meteorNumber,
+        text: `${i + 1}`,
+        x: randomCoords.x,
+        y: randomCoords.y,
+        index: i,
+      });
+      meteorNumber.on(
+        Phaser.Input.Events.POINTER_UP,
+        () => {
+          destroyBubble(meteorNumber, `${i + 1}`, text, i);
+        },
+        this
+      );
 
-    const text = this.add
-      .text(randomCoords.x + 40, randomCoords.y + 35, `${i + 1}`, style)
-      .setOrigin(0, 0);
-    meteors.push({
-      meteor,
-      text: text,
-      x: randomCoords.x,
-      y: randomCoords.y,
-      id: i,
-    });
+      randomCoords = generateNonInclusiveRandom();
+      const meteorText = this.add
+        .sprite(randomCoords.x, randomCoords.y, "meteor")
+        .setOrigin(0, 0);
+      meteorText.setInteractive({ cursor: "pointer" });
+      meteorText.setScale(gameConfig.meteorScale);
 
-    meteor.on(
-      Phaser.Input.Events.POINTER_UP,
-      () => {
-        destroyBubble(meteor, text, i);
-      },
-      this
-    );
+      const letter = wordsArray.shift();
+      const textLetter = this.add
+        .text(randomCoords.x + 40, randomCoords.y + 35, `${letter}`, style)
+        .setOrigin(0, 0);
+
+      meteors.push({
+        meteorText,
+        text: `${letter}`,
+        x: randomCoords.x,
+        y: randomCoords.y,
+        index: i,
+      });
+
+      meteorText.on(
+        Phaser.Input.Events.POINTER_UP,
+        () => {
+          destroyBubble(meteorText, `${letter}`, textLetter, i);
+        },
+        this
+      );
+    } else {
+      randomCoords = generateNonInclusiveRandom();
+      const meteor = this.add
+        .sprite(randomCoords.x, randomCoords.y, "meteor")
+        .setOrigin(0, 0);
+      meteor.setInteractive({ cursor: "pointer" });
+      meteor.setScale(gameConfig.meteorScale);
+      const style = {
+        font: "30px Arial",
+        fill: "#000000",
+        wordWrap: true,
+        fontWeight: "bold",
+        wordWrapWidth: meteor.width,
+        align: "center",
+      };
+
+      const text = this.add
+        .text(randomCoords.x + 40, randomCoords.y + 35, `${i + 1}`, style)
+        .setOrigin(0, 0);
+      meteors.push({
+        meteor,
+        text: `${i + 1}`,
+        x: randomCoords.x,
+        y: randomCoords.y,
+        index: i,
+      });
+      meteor.on(
+        Phaser.Input.Events.POINTER_UP,
+        () => {
+          destroyBubble(meteor, `${i + 1}`, text, i);
+        },
+        this
+      );
+    }
   }
 }
 
 function update() {}
 
-function destroyBubble(sprite, text, id) {
+function destroyBubble(sprite, textContent, textSprite, meteorIndex) {
   if (!timerOn) {
     timer = setInterval(updateTime, 1000);
     timerOn = true;
   }
 
-  sprite.destroy();
-  text.destroy();
+  const index = meteors.findIndex((meteor) => meteor.index === meteorIndex);
 
-  const index = meteors.findIndex((meteor) => meteor.id === id);
-
-  meteors.splice(index, 1);
-  console.log(meteors);
+  if (sequence[0].toString() === textContent) {
+    sequence.shift();
+    sprite.destroy();
+    textSprite.destroy();
+    meteors.splice(index, 1);
+  }
 
   if (meteors.length === 0) {
     clearInterval(timer);
     timerOn = false;
+    alert(`Tu tiempo fue de: ${timeInSeconds} segundos`);
   }
 }
 
@@ -101,7 +191,12 @@ function updateTime() {
 
 function restart() {
   gameConfig.grid = new Array(8).fill(0).map(() => new Array(6).fill(0));
+  gameConfig.gameType = gameType.value;
+  gameConfig.numberOfMeteors = numberOfMeteors.value;
+  clearInterval(timer);
   timeInSeconds = 0;
+  timeElement.innerHTML = "Tiempo :";
+  timerOn = false;
   game.destroy(true);
   game = new Phaser.Game(config);
 }
@@ -115,5 +210,39 @@ function generateNonInclusiveRandom() {
   } else {
     gameConfig.grid[x][y] = 1;
     return { x: x * 100, y: y * 100 };
+  }
+}
+
+function generateSequence(type) {
+  sequence = [];
+  const wordsArray = [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "Ñ",
+    "O",
+    "P",
+    "Q",
+  ];
+
+  if (type === "A") {
+    for (let i = 0; i < gameConfig.numberOfMeteors; i++) {
+      sequence.push(i + 1);
+    }
+  } else {
+    for (let i = 0; i < gameConfig.numberOfMeteors; i++) {
+      sequence.push(i + 1);
+      sequence.push(wordsArray[i]);
+    }
   }
 }

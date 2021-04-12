@@ -15,8 +15,5 @@
   "bugs": {
     "url": "https://github.com/leonardocelis112/brain_game/issues"
   },
-  "homepage": "https://github.com/leonardocelis112/brain_game#readme",
-  "dependencies": {
-    "phaser": "^3.54.0"
-  }
+  "homepage": "https://github.com/leonardocelis112/brain_game#readme"
 }

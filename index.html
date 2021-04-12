@@ -1,32 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.54.0/dist/phaser.min.js"></script>
+    <title>Document</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="node_modules/phaser/dist/phaser.js"></script>
-  <title>Document</title>
-</head>
+  <body>
+    <h3 id="time-text">Tiempo:</h3>
+    <label for="">Numero de burbujas</label>
+    <select id="number-of-meteors">
+      <option value="7">7</option>
+      <option value="15">15</option>
+    </select>
+    <label for="">Tipo de juego</label>
+    <select id="game-type">
+      <option value="A">Solo números</option>
+      <option value="B">Números y letras</option>
+    </select>
+    <button id="restart-btn">Cambiar Reglas o Reiniciar</button>
+    <div id="phaser-example"></div>
 
-<body>
-  <h3 id="time-text">Tiempo: </h3>
-  <label for="">Numero de planetas</label>
-  <select>
-    <option value="7">7</option>
-    <option value="7">15</option>
-  </select>
-  <label for="">Tipo de juego</label>
-  <select>
-    <option value="A">Solo números</option>
-    <option value="B">Números y letras</option>
-  </select>
-  <button id="restart-btn">Cambiar Reglas</button>
-  <div id="phaser-example"></div>
-
-
-  <script type="text/javascript" src="/index.js"></script>
-
-</body>
-
+    <script type="text/javascript" src="/index.js"></script>
+  </body>
 </html>
